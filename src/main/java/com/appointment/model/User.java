@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.Column;
+
 
 @Entity
 @Table(name = "users")
@@ -23,6 +25,8 @@ public class User {
     private Long id;
 
     private String name;
+    
+    @Column(unique = true)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

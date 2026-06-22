@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.appointment.dto.LoginRequestDto;
+import com.appointment.dto.LoginResponseDto;
 import com.appointment.dto.RegisterRequestDto;
 import com.appointment.model.User;
 import com.appointment.service.AuthService;
@@ -24,7 +25,7 @@ public class AuthController {
 		return authService.register(dto);
 	}
 	@PostMapping("/login")
-	public String login(
+	public LoginResponseDto login(
 	        @RequestBody LoginRequestDto dto) {
 
 	    return authService.login(dto);
