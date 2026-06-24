@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,6 +53,12 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/auth/**")
                     .permitAll()
+                    
+                    .requestMatchers(
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/v3/api-docs")
+                    .permitAll()
 
                     .requestMatchers("/users/**")
                     .hasRole("ADMIN")
@@ -60,8 +66,11 @@ public class SecurityConfig {
                     .requestMatchers("/services/**")
                     .hasRole("ADMIN")
 
-                    .requestMatchers("/appointments/**")
+                    .requestMatchers("/appointments/my")
                     .hasAnyRole("USER", "ADMIN")
+                    
+                    .requestMatchers("/appointments/**")
+                    .hasRole("ADMIN")
 
                     .anyRequest()
                     .authenticated())

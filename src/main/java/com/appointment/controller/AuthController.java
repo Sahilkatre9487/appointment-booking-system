@@ -12,6 +12,8 @@ import com.appointment.dto.RegisterRequestDto;
 import com.appointment.model.User;
 import com.appointment.service.AuthService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -21,12 +23,12 @@ public class AuthController {
 	
 	@PostMapping("/register")
 	public User register(
-			@RequestBody RegisterRequestDto dto) {
+			@Valid @RequestBody RegisterRequestDto dto) {
 		return authService.register(dto);
 	}
 	@PostMapping("/login")
 	public LoginResponseDto login(
-	        @RequestBody LoginRequestDto dto) {
+	       @Valid @RequestBody LoginRequestDto dto) {
 
 	    return authService.login(dto);
 	}
