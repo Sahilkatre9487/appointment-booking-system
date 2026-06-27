@@ -65,7 +65,10 @@ public class SecurityConfig {
 
                     .requestMatchers("/services/**")
                     .hasRole("ADMIN")
-
+                    
+                    .requestMatchers("/appointments")
+                    .hasAnyRole("USER", "ADMIN")
+                    
                     .requestMatchers("/appointments/my")
                     .hasAnyRole("USER", "ADMIN")
                     

@@ -1,5 +1,6 @@
 package com.appointment.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +9,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.appointment.dto.AppointmentRequestDto;
+import com.appointment.dto.DashboardDto;
 import com.appointment.model.Appointment;
 import com.appointment.model.ServiceEntity;
 import com.appointment.model.User;
 import com.appointment.repository.AppointmentRepository;
 import com.appointment.repository.ServiceRepository;
 import com.appointment.repository.UserRepository;
+
+
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+
 @Service
 public class AppointmentService {
 
@@ -28,8 +39,32 @@ public class AppointmentService {
     
     @Autowired
     private EmailService emailService;
+    
+    public Page<Appointment> getAppointments(
+            int page,
+            int size,
+            String sortBy) {
 
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by(sortBy));
+
+        return appointmentRepository.findAll(pageable);
+    }
+    
     public Appointment saveAppointment(AppointmentRequestDto dto) {
+    	
+    	if (appointmentRepository
+                .existsByServiceIdAndAppointmentDateAndAppointmentTime(
+                        dto.getServiceId(),
+                        dto.getAppointmentDate(),
+                        dto.getAppointmentTime())) {
+
+            throw new RuntimeException(
+                    "This time slot is already booked.");
+        }
 
         User user = userRepository.findById(dto.getUserId()).get();
 
@@ -50,6 +85,10 @@ public class AppointmentService {
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
+    public List<Appointment> getAppointmentsByStatus(String status) {
+        return appointmentRepository.findByStatus(status);
+    }
+    
     public Appointment approveAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
@@ -87,6 +126,31 @@ public class AppointmentService {
     	
     	return appointmentRepository
     			.findByUserEmail(email);
+    }
+    public List<Appointment> getAppointmentsByDate(
+            LocalDate appointmentDate) {
+
+        return appointmentRepository
+                .findByAppointmentDate(
+                        appointmentDate);
+    }
+    
+    public DashboardDto getDashboardStats() {
+    	
+    	DashboardDto dto=new DashboardDto();
+    	dto.setTotalAppointments(
+    			appointmentRepository.count());
+    	
+    	dto.setPendingAppointments(
+                appointmentRepository.countByStatus("PENDING"));
+
+        dto.setApprovedAppointments(
+                appointmentRepository.countByStatus("APPROVED"));
+
+        dto.setCancelledAppointments(
+                appointmentRepository.countByStatus("CANCELLED"));
+
+        return dto;
     }
     
 }
