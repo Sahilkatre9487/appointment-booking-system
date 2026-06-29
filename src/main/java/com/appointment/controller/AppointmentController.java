@@ -82,5 +82,10 @@ public class AppointmentController {
         return appointmentService.getDashboardStats();
     }
     //hello
+    @GetMapping("/service/{serviceName}")
+    public List<Appointment> getByService(
+            @PathVariable String serviceName) {
+        return appointmentService.getByService(serviceName);
+    }
    
 }

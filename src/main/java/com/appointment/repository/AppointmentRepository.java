@@ -17,6 +17,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>{
 	
 	List<Appointment> findByAppointmentDate(
 	        LocalDate appointmentDate);
+	List<Appointment> findByServiceServiceName(String serviceName);
 	
 	long countByStatus(String status);
 	
@@ -24,5 +25,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>{
 	        Long serviceId,
 	        LocalDate appointmentDate,
 	        LocalTime appointmentTime);
+
+	
 	
 }

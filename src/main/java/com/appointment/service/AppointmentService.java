@@ -152,6 +152,12 @@ public class AppointmentService {
 
         return dto;
     }
+
+	public List<Appointment> getByService(String serviceName) {
+		// TODO Auto-generated method stub
+		return appointmentRepository
+	            .findByServiceServiceName(serviceName);
+	}
     
 }
 

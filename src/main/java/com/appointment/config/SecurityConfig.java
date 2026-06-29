@@ -43,6 +43,7 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
+            .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
 
             .sessionManagement(session ->
@@ -62,6 +63,9 @@ public class SecurityConfig {
 
                     .requestMatchers("/users/**")
                     .hasRole("ADMIN")
+                    
+                    .requestMatchers("/services")
+                    .hasAnyRole("USER", "ADMIN")
 
                     .requestMatchers("/services/**")
                     .hasRole("ADMIN")
