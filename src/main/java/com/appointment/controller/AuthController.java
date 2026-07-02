@@ -17,10 +17,10 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-	
+
 	@Autowired
 	private AuthService authService;
-	
+
 	@PostMapping("/register")
 	public User register(
 			@Valid @RequestBody RegisterRequestDto dto) {

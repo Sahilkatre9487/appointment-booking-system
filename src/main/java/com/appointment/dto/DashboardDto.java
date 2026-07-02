@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DashboardDto {
-	
+
 	private long totalAppointments;
-	
+
 	private long pendingAppointments;
-	
+
 	private long approvedAppointments;
-	
+
 	private long cancelledAppointments;
-	
-	
+
+
 
 }

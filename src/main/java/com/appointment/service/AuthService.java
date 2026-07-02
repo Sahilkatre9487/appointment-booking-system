@@ -1,7 +1,6 @@
 package com.appointment.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,31 +13,31 @@ import com.appointment.security.JwtUtil;
 
 @Service
 public class AuthService {
-	
+
 	@Autowired
 	private JwtUtil jwtUtil;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	public User register(RegisterRequestDto dto) {
-		
+
 		  if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
 		        throw new RuntimeException("Email already exists");
 		    }
-		  
+
 		User user =new User();
-		
+
 		user.setName(dto.getName());
 		user.setEmail(dto.getEmail());
-		
+
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
-		
+
 		user.setRole("USER");
-		
+
 		return userRepository.save(user);
 	}
 	public LoginResponseDto login(LoginRequestDto dto) {
@@ -55,8 +54,8 @@ public class AuthService {
 
 	    String token = jwtUtil.generateToken(user.getEmail());
 
-	    return new LoginResponseDto(token);
+	    return new LoginResponseDto(token, user.getRole());
 	}
-	
+
 
 }

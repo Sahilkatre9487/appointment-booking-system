@@ -103,6 +103,24 @@ export const getAppointmentsByService = (serviceName) => {
     }
   );
 };
+export const deleteAppointment = (id) => {
+  return axios.delete(`${API_URL}/appointments/${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+};
+export const updateAppointment = (id, appointment) => {
+  return axios.put(
+    `${API_URL}/appointments/${id}`,
+    appointment,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+};
 
 
 

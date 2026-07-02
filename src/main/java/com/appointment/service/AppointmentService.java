@@ -4,6 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,13 +22,6 @@ import com.appointment.repository.ServiceRepository;
 import com.appointment.repository.UserRepository;
 
 
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-
-
 @Service
 public class AppointmentService {
 
@@ -36,10 +33,10 @@ public class AppointmentService {
 
     @Autowired
     private ServiceRepository serviceRepository;
-    
+
     @Autowired
     private EmailService emailService;
-    
+
     public Page<Appointment> getAppointments(
             int page,
             int size,
@@ -53,9 +50,9 @@ public class AppointmentService {
 
         return appointmentRepository.findAll(pageable);
     }
-    
+
     public Appointment saveAppointment(AppointmentRequestDto dto) {
-    	
+
     	if (appointmentRepository
                 .existsByServiceIdAndAppointmentDateAndAppointmentTime(
                         dto.getServiceId(),
@@ -88,16 +85,16 @@ public class AppointmentService {
     public List<Appointment> getAppointmentsByStatus(String status) {
         return appointmentRepository.findByStatus(status);
     }
-    
+
     public Appointment approveAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
-        
+
         emailService.sendEmail(
                 appointment.getUser().getEmail(),
                 "Appointment Approved",
                 "Your appointment has been approved.");
-        
+
         appointment.setStatus("APPROVED");
 
         return appointmentRepository.save(appointment);
@@ -106,24 +103,24 @@ public class AppointmentService {
     public Appointment cancelAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
-        
+
         emailService.sendEmail(
                 appointment.getUser().getEmail(),
                 "Appointment Cancelled",
                 "Your appointment has been cancelled.");
-        
+
         appointment.setStatus("CANCELLED");
 
         return appointmentRepository.save(appointment);
     }
-    
+
     public List<Appointment> getMyAppointment(){
     	Authentication authentication=
     			SecurityContextHolder.getContext()
     			.getAuthentication();
-    	
+
     	String email =authentication.getName();
-    	
+
     	return appointmentRepository
     			.findByUserEmail(email);
     }
@@ -134,13 +131,13 @@ public class AppointmentService {
                 .findByAppointmentDate(
                         appointmentDate);
     }
-    
+
     public DashboardDto getDashboardStats() {
-    	
+
     	DashboardDto dto=new DashboardDto();
     	dto.setTotalAppointments(
     			appointmentRepository.count());
-    	
+
     	dto.setPendingAppointments(
                 appointmentRepository.countByStatus("PENDING"));
 
@@ -158,7 +155,26 @@ public class AppointmentService {
 		return appointmentRepository
 	            .findByServiceServiceName(serviceName);
 	}
-    
+
+	public void deleteAppointment(Long id) {
+
+	    appointmentRepository.deleteById(id);
+
+	}
+
+	public Appointment updateAppointment(Long id, Appointment updatedAppointment) {
+
+	    Appointment appointment = appointmentRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+	    appointment.setAppointmentDate(updatedAppointment.getAppointmentDate());
+	    appointment.setAppointmentTime(updatedAppointment.getAppointmentTime());
+	    appointment.setStatus(updatedAppointment.getStatus());
+	    appointment.setService(updatedAppointment.getService());
+
+	    return appointmentRepository.save(appointment);
+	}
+
 }
 
 

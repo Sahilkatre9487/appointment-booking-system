@@ -3,6 +3,8 @@ import {
   getAllAppointments,
   approveAppointment,
   cancelAppointment,
+  deleteAppointment,
+  updateAppointment,
   getDashboardStats,
   getAppointmentsByStatus,
   getAppointmentsByDate,
@@ -21,6 +23,9 @@ function AdminAppointments() {
   const [totalPages, setTotalPages] = useState(0);
   const [sortBy, setSortBy] = useState("appointmentDate");
   const navigate = useNavigate();
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [editStatus, setEditStatus] = useState("");
 
 
 
@@ -69,7 +74,7 @@ const filterByStatus = async (status) => {
 };
 
 const handleServiceSearch = async () => {
-  if (!serviceName) {
+  if (serviceName === "") {
     loadAppointments();
     return;
   }
@@ -108,6 +113,38 @@ const handleDateSearch = async () => {
     await cancelAppointment(id);
     loadAppointments();
   };
+      const handleDelete = async (id) => {
+  if (!window.confirm("Delete this appointment?")) {
+    return;
+  }
+
+  try {
+    await deleteAppointment(id);
+    loadAppointments();
+  } catch (error) {
+    console.log(error);
+    alert("Unable to delete appointment");
+  }
+};
+
+const handleUpdate = async () => {
+  try {
+    await updateAppointment(editingAppointment.id, {
+      ...editingAppointment,
+      status: editStatus,
+    });
+
+    setEditingAppointment(null);
+    loadAppointments();
+
+    alert("Appointment Updated Successfully");
+  } catch (error) {
+    console.log(error);
+    alert("Unable to update appointment");
+  }
+};
+
+
   const handleLogout = () => {
   localStorage.clear();
   navigate("/");
@@ -225,19 +262,39 @@ const handleDateSearch = async () => {
     <option value="id">ID</option>
   </select>
 </div>
+      <div className="row mt-3">
+  <div className="col-md-4">
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Search by Service"
+      value={serviceName}
+      onChange={(e) => setServiceName(e.target.value)}
+    />
+  </div>
+
+  <div className="col-md-2">
+    <button
+      className="btn btn-dark"
+      onClick={handleServiceSearch}
+    >
+      Search
+    </button>
+  </div>
+</div>
 
       <table className="table table-bordered mt-4">
         <thead>
-          <tr>
+             <tr>
             <th>ID</th>
             <th>User</th>
-            <th>Service</th>
+           <th>Service</th>
             <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
+           <th>Time</th>
+           <th>Status</th>
             <th>Action</th>
-          </tr>
-        </thead>
+            </tr>
+     </thead>
 
         <tbody>
           {appointments.map((appointment) => (
@@ -247,7 +304,19 @@ const handleDateSearch = async () => {
               <td>{appointment.service.serviceName}</td>
               <td>{appointment.appointmentDate}</td>
               <td>{appointment.appointmentTime}</td>
-              <td>{appointment.status}</td>
+              <td>
+  <span
+    className={`badge ${
+      appointment.status === "APPROVED"
+        ? "bg-success"
+        : appointment.status === "PENDING"
+        ? "bg-warning text-dark"
+        : "bg-danger"
+    }`}
+  >
+    {appointment.status}
+  </span>
+</td>
 
               <td>
                 <button
@@ -260,13 +329,35 @@ const handleDateSearch = async () => {
                 </button>
 
                 <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() =>
-                    handleCancel(appointment.id)
-                  }
-                >
-                  Cancel
-                </button>
+  className="btn btn-danger btn-sm me-2"
+  onClick={() => handleCancel(appointment.id)}
+>
+  Cancel
+</button>
+
+<button
+  className="btn btn-info btn-sm me-2"
+  onClick={() => setSelectedAppointment(appointment)}
+>
+  View
+</button>
+
+<button
+  className="btn btn-warning btn-sm me-2"
+  onClick={() => {
+    setEditingAppointment(appointment);
+    setEditStatus(appointment.status);
+  }}
+>
+  Edit
+</button>
+
+<button
+  className="btn btn-dark btn-sm"
+  onClick={() => handleDelete(appointment.id)}
+>
+  Delete
+</button>
               </td>
             </tr>
           ))}
@@ -297,6 +388,139 @@ Next
 >
   Logout
 </button>
+
+          {selectedAppointment && (
+  <div
+    className="modal d-block"
+    tabIndex="-1"
+    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+  >
+    <div className="modal-dialog">
+      <div className="modal-content">
+
+        <div className="modal-header">
+          <h5 className="modal-title">
+            Appointment Details
+          </h5>
+
+          <button
+            className="btn-close"
+            onClick={() => setSelectedAppointment(null)}
+          ></button>
+        </div>
+
+        <div className="modal-body">
+
+          <p><strong>ID:</strong> {selectedAppointment.id}</p>
+
+          <p><strong>User:</strong> {selectedAppointment.user.name}</p>
+
+          <p><strong>Email:</strong> {selectedAppointment.user.email}</p>
+
+          <p><strong>Service:</strong> {selectedAppointment.service.serviceName}</p>
+
+          <p><strong>Date:</strong> {selectedAppointment.appointmentDate}</p>
+
+          <p><strong>Time:</strong> {selectedAppointment.appointmentTime}</p>
+
+          <p><strong>Status:</strong> {selectedAppointment.status}</p>
+
+        </div>
+
+        <div className="modal-footer">
+
+          <button
+            className="btn btn-secondary"
+            onClick={() => setSelectedAppointment(null)}
+          >
+            Close
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
+
+    {editingAppointment && (
+  <div
+    className="modal d-block"
+    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+  >
+    <div className="modal-dialog">
+      <div className="modal-content">
+
+        <div className="modal-header">
+          <h5>Edit Appointment</h5>
+
+          <button
+            className="btn-close"
+            onClick={() => setEditingAppointment(null)}
+          ></button>
+        </div>
+
+        <div className="modal-body">
+
+          <p>
+            <strong>User:</strong>{" "}
+            {editingAppointment.user.name}
+          </p>
+
+          <p>
+            <strong>Service:</strong>{" "}
+            {editingAppointment.service.serviceName}
+          </p>
+
+          <label className="form-label">
+            Status
+          </label>
+
+          <select
+            className="form-select"
+            value={editStatus}
+            onChange={(e) =>
+              setEditStatus(e.target.value)
+            }
+          >
+            <option value="PENDING">
+              PENDING
+            </option>
+
+            <option value="APPROVED">
+              APPROVED
+            </option>
+
+            <option value="CANCELLED">
+              CANCELLED
+            </option>
+          </select>
+
+        </div>
+
+        <div className="modal-footer">
+
+          <button
+            className="btn btn-secondary"
+            onClick={() => setEditingAppointment(null)}
+          >
+            Close
+          </button>
+
+          <button
+            className="btn btn-primary"
+            onClick={handleUpdate}
+          >
+            Update
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
+          
     </div>
   );
 }

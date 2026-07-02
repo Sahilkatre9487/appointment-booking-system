@@ -10,14 +10,14 @@ import com.appointment.repository.ServiceRepository;
 
 @Service
 public class ServiceEntityService {
-	
+
 	@Autowired
 	public ServiceRepository serviceRepository;
-	
+
 	public ServiceEntity saveService(ServiceEntity service) {
 		return serviceRepository.save(service);
 	}
-	
+
 	public List<ServiceEntity>getAllServices(){
 		return serviceRepository.findAll();
 	}

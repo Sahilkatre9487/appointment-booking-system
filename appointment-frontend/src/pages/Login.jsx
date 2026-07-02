@@ -10,7 +10,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Button Clicked");
+    console.log("===== NEW LOGIN PAGE =====");
 
     try {
       const response = await login({
@@ -19,13 +19,21 @@ function Login() {
       });
 
       console.log(response.data);
+      console.log("Role from backend:", response.data.role);
 
       localStorage.setItem("token", response.data.token);
-      navigate("/dashboard");
+         localStorage.setItem("role", response.data.role);
 
-    
+         console.log("Saved role:", response.data.role);
+console.log("Role in localStorage:", localStorage.getItem("role"));
 
-      alert("Login Successful");
+         if (response.data.role === "ADMIN") {
+        navigate("/admin/appointments");
+         } else {
+            navigate("/my-appointments");
+      }
+
+        alert("Login Successful");
 
     } catch (error) {
       console.log(error);
