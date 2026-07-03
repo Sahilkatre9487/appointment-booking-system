@@ -1,77 +1,119 @@
-import { useEffect, useState } from "react";
-import { getDashboardStats } from "../services/appointmentService";
 import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
 
-  const [stats, setStats] = useState({});
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      const response = await getDashboardStats();
-      setStats(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const navigate = useNavigate();
 
-const handleLogout = () => {
-  localStorage.clear();
-  navigate("/");
-};
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
 
   return (
+
     <div className="container mt-5">
 
-      <h2 className="mb-4">
-        Dashboard
-      </h2>
+      <div className="text-center mb-5">
+
+        <h1>
+          👋 Welcome
+        </h1>
+
+        <p className="text-muted">
+          Manage your appointments easily from your dashboard.
+        </p>
+
+      </div>
 
       <div className="row">
 
-        <div className="col-md-3">
-          <div className="card bg-primary text-white p-3">
-            <h5>Total Appointments</h5>
-            <h2>{stats.totalAppointments}</h2>
+        <div className="col-md-4 mb-4">
+
+          <div className="card shadow h-100">
+
+            <div className="card-body text-center">
+
+              <h1>📅</h1>
+
+              <h4>Book Appointment</h4>
+
+              <p>
+                Schedule a new appointment with a doctor.
+              </p>
+
+              <button
+                className="btn btn-primary"
+                onClick={() => navigate("/book")}
+              >
+                Book Now
+              </button>
+
+            </div>
+
           </div>
+
         </div>
 
-        <div className="col-md-3">
-          <div className="card bg-success text-white p-3">
-            <h5>Approved</h5>
-            <h2>{stats.approvedAppointments}</h2>
+        <div className="col-md-4 mb-4">
+
+          <div className="card shadow h-100">
+
+            <div className="card-body text-center">
+
+              <h1>📖</h1>
+
+              <h4>My Appointments</h4>
+
+              <p>
+                View all your booked appointments.
+              </p>
+
+              <button
+                className="btn btn-success"
+                onClick={() => navigate("/my-appointments")}
+              >
+                View
+              </button>
+
+            </div>
+
           </div>
+
         </div>
 
-        <div className="col-md-3">
-          <div className="card bg-warning text-dark p-3">
-            <h5>Pending</h5>
-            <h2>{stats.pendingAppointments}</h2>
-          </div>
-        </div>
+        <div className="col-md-4 mb-4">
 
-        <div className="col-md-3">
-          <div className="card bg-danger text-white p-3">
-            <h5>Cancelled</h5>
-            <h2>{stats.cancelledAppointments}</h2>
+          <div className="card shadow h-100">
+
+            <div className="card-body text-center">
+
+              <h1>🚪</h1>
+
+              <h4>Logout</h4>
+
+              <p>
+                Securely logout from your account.
+              </p>
+
+              <button
+                className="btn btn-danger"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+
+            </div>
+
           </div>
+
         </div>
 
       </div>
-        <button
-  className="btn btn-danger float-end"
-  onClick={handleLogout}
-     >
-         Logout
-         </button>
+
     </div>
-    
+
   );
+
 }
 
 export default Dashboard;

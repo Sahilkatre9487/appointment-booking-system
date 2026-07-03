@@ -10,8 +10,24 @@ import {
   getAppointmentsByDate,
   getAppointmentsByService,
   getAppointmentsPage,
+  exportAppointmentsToExcel,
+  exportAppointmentsToPdf,
 } from "../services/appointmentService";
 import { useNavigate } from "react-router-dom";
+import { Pie } from "react-chartjs-2";
+
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 function AdminAppointments() {
   const [appointments, setAppointments] = useState([]);
@@ -126,6 +142,59 @@ const handleDateSearch = async () => {
     alert("Unable to delete appointment");
   }
 };
+const handleExportExcel = async () => {
+  try {
+    const response = await exportAppointmentsToExcel();
+
+    const url = window.URL.createObjectURL(
+      new Blob([response.data])
+    );
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute(
+      "download",
+      "appointments.xlsx"
+    );
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+  } catch (error) {
+    console.log(error);
+    alert("Unable to export Excel");
+  }
+};
+const handleExportPdf = async () => {
+  try {
+
+    const response = await exportAppointmentsToPdf();
+
+    const url = window.URL.createObjectURL(
+      new Blob([response.data])
+    );
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "appointments.pdf";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.log(error);
+    alert("PDF Export Failed");
+  }
+};
 
 const handleUpdate = async () => {
   try {
@@ -148,6 +217,25 @@ const handleUpdate = async () => {
   const handleLogout = () => {
   localStorage.clear();
   navigate("/");
+};
+const chartData = {
+  labels: ["Approved", "Pending", "Cancelled"],
+
+  datasets: [
+    {
+      data: [
+        dashboard.approvedAppointments || 0,
+        dashboard.pendingAppointments || 0,
+        dashboard.cancelledAppointments || 0,
+      ],
+
+      backgroundColor: [
+        "#198754",
+        "#ffc107",
+        "#dc3545",
+      ],
+    },
+  ],
 };
 
   return (
@@ -215,6 +303,8 @@ const handleUpdate = async () => {
       onChange={(e) => setSelectedDate(e.target.value)}
     />
   </div>
+
+ 
 
   <div className="col-md-2">
     <button
@@ -381,7 +471,37 @@ Next
 </button>
 
 </div>
+ <div className="row mt-4">
+  <div className="col-md-6 mx-auto">
 
+    <div className="card shadow">
+
+      <div className="card-header text-center">
+        <h4>Appointment Status Overview</h4>
+      </div>
+
+      <div className="card-body">
+        <Pie data={chartData} />
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+          <button
+  className="btn btn-success me-2"
+  onClick={handleExportExcel}
+>
+  Export Excel
+</button>
+
+<button
+    className="btn btn-primary"
+    onClick={handleExportPdf}
+  >
+    Export PDF
+  </button>
       <button
   className="btn btn-danger float-end"
   onClick={handleLogout}

@@ -19,6 +19,13 @@ import com.appointment.dto.AppointmentRequestDto;
 import com.appointment.dto.DashboardDto;
 import com.appointment.model.Appointment;
 import com.appointment.service.AppointmentService;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 
 @RestController
@@ -107,6 +114,44 @@ public class AppointmentController {
     public List<Appointment> getByService(
             @PathVariable String serviceName) {
         return appointmentService.getByService(serviceName);
+    }
+    
+    @GetMapping("/export/excel")
+    public ResponseEntity<InputStreamResource> exportAppointmentsToExcel()
+            throws IOException {
+
+        ByteArrayInputStream in =
+                appointmentService.exportAppointmentsToExcel();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add(
+                "Content-Disposition",
+                "attachment; filename=appointments.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new InputStreamResource(in));
+    }
+    
+    @GetMapping("/export/pdf")
+    public ResponseEntity<InputStreamResource> exportAppointmentsToPdf()
+            throws Exception {
+
+        ByteArrayInputStream in =
+                appointmentService.exportAppointmentsToPdf();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add(
+                "Content-Disposition",
+                "attachment; filename=appointments.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(in));
     }
 
 }

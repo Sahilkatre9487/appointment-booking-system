@@ -20,7 +20,22 @@ import com.appointment.model.User;
 import com.appointment.repository.AppointmentRepository;
 import com.appointment.repository.ServiceRepository;
 import com.appointment.repository.UserRepository;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.appointment.security.JwtUtil;
 
 @Service
 public class AppointmentService {
@@ -173,6 +188,140 @@ public class AppointmentService {
 	    appointment.setService(updatedAppointment.getService());
 
 	    return appointmentRepository.save(appointment);
+	}
+	
+	public ByteArrayInputStream exportAppointmentsToExcel() throws IOException {
+
+	    List<Appointment> appointments = appointmentRepository.findAll();
+
+	    XSSFWorkbook workbook = new XSSFWorkbook();
+	    XSSFSheet sheet = workbook.createSheet("Appointments");
+
+	    Row header = sheet.createRow(0);
+
+	    header.createCell(0).setCellValue("ID");
+	    header.createCell(1).setCellValue("User");
+	    header.createCell(2).setCellValue("Email");
+	    header.createCell(3).setCellValue("Service");
+	    header.createCell(4).setCellValue("Date");
+	    header.createCell(5).setCellValue("Time");
+	    header.createCell(6).setCellValue("Status");
+
+	    int rowNum = 1;
+
+	    for (Appointment appointment : appointments) {
+
+	        Row row = sheet.createRow(rowNum++);
+
+	        row.createCell(0).setCellValue(appointment.getId());
+	        row.createCell(1).setCellValue(appointment.getUser().getName());
+	        row.createCell(2).setCellValue(appointment.getUser().getEmail());
+	        row.createCell(3).setCellValue(appointment.getService().getServiceName());
+	        row.createCell(4).setCellValue(
+	        	    appointment.getAppointmentDate() != null
+	        	        ? appointment.getAppointmentDate().toString()
+	        	        : "N/A");
+	        row.createCell(5).setCellValue(
+	        	    appointment.getAppointmentTime() != null
+	        	        ? appointment.getAppointmentTime().toString()
+	        	        : "N/A");
+	        row.createCell(6).setCellValue(appointment.getStatus());
+	    }
+
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    workbook.write(out);
+	    workbook.close();
+
+	    return new ByteArrayInputStream(out.toByteArray());
+	}
+	
+	public ByteArrayInputStream exportAppointmentsToPdf() throws Exception {
+
+	    Document document = new Document();
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+	    PdfWriter.getInstance(document, out);
+
+	    document.open();
+
+	    document.add(new Paragraph("Appointment Report"));
+	    document.add(new Paragraph(" "));
+
+	    PdfPTable table = new PdfPTable(7);
+
+	    table.addCell("ID");
+	    table.addCell("User");
+	    table.addCell("Email");
+	    table.addCell("Service");
+	    table.addCell("Date");
+	    table.addCell("Time");
+	    table.addCell("Status");
+
+	    for (Appointment appointment : appointmentRepository.findAll()) {
+
+	        table.addCell(String.valueOf(appointment.getId()));
+	        table.addCell(appointment.getUser().getName());
+	        table.addCell(appointment.getUser().getEmail());
+	        table.addCell(appointment.getService().getServiceName());
+
+	        table.addCell(
+	                appointment.getAppointmentDate() != null
+	                        ? appointment.getAppointmentDate().toString()
+	                        : "N/A");
+
+	        table.addCell(
+	                appointment.getAppointmentTime() != null
+	                        ? appointment.getAppointmentTime().toString()
+	                        : "N/A");
+
+	        table.addCell(appointment.getStatus());
+	    }
+
+	    document.add(table);
+
+	    document.close();
+
+	    return new ByteArrayInputStream(out.toByteArray());
+	}
+	public List<Appointment> getProviderAppointments(String providerEmail) {
+
+	    User provider = userRepository.findByEmail(providerEmail)
+	            .orElseThrow(() -> new RuntimeException("Provider not found"));
+
+	    return appointmentRepository.findAll()
+	            .stream()
+	            .filter(a -> a.getService().getProvider() != null)
+	            .filter(a -> a.getService().getProvider().getId().equals(provider.getId()))
+	            .toList();
+	}
+	public DashboardDto getProviderDashboard(String email) {
+
+	    User provider = userRepository.findByEmail(email)
+	            .orElseThrow();
+
+	    List<Appointment> list = appointmentRepository.findAll()
+	            .stream()
+	            .filter(a -> a.getService().getProvider() != null)
+	            .filter(a -> a.getService().getProvider().getId().equals(provider.getId()))
+	            .toList();
+
+	    DashboardDto dto = new DashboardDto();
+
+	    dto.setTotalAppointments(list.size());
+
+	    dto.setPendingAppointments(
+	            list.stream().filter(a -> a.getStatus().equals("PENDING")).count()
+	    );
+
+	    dto.setApprovedAppointments(
+	            list.stream().filter(a -> a.getStatus().equals("APPROVED")).count()
+	    );
+
+	    dto.setCancelledAppointments(
+	            list.stream().filter(a -> a.getStatus().equals("CANCELLED")).count()
+	    );
+
+	    return dto;
 	}
 
 }

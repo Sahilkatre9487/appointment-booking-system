@@ -28,4 +28,8 @@ public class ServiceController {
     public List<ServiceEntity> getAllServices() {
         return service.getAllServices();
     }
+    @GetMapping("/public")
+    public List<ServiceEntity> getAllPublicServices() {
+        return service.getAllServices();
+    }
 }

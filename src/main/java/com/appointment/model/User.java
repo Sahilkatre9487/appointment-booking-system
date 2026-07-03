@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "users")
 @Data
@@ -32,6 +31,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    // ROLE FOR EASYBOOK SYSTEM
+    // VALUES: USER, ADMIN, PROVIDER
     private String role;
 }
-//HI

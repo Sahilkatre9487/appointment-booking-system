@@ -58,21 +58,39 @@ public class SecurityConfig {
 
                     .requestMatchers("/users/**")
                     .hasRole("ADMIN")
-
+                    
+                    .requestMatchers("/services/public")
+                    .permitAll()
                     .requestMatchers("/services")
                     .hasAnyRole("USER", "ADMIN")
 
                     .requestMatchers("/services/**")
                     .hasRole("ADMIN")
+                    
+                    .requestMatchers("/provider/**")
+                    .hasAnyRole("PROVIDER", "ADMIN")
 
-                    .requestMatchers("/appointments")
+                    .requestMatchers(
+                            "/appointments",
+                            "/appointments/my",
+                            "/appointments/dashboard"
+                    )
                     .hasAnyRole("USER", "ADMIN")
 
-                    .requestMatchers("/appointments/my")
-                    .hasAnyRole("USER", "ADMIN")
-
-                    .requestMatchers("/appointments/**")
+                    .requestMatchers(
+                            "/appointments/admin/**",
+                            "/appointments/export/**",
+                            "/appointments/search/**"
+                    )
                     .hasRole("ADMIN")
+//                    .requestMatchers("/appointments")
+//                    .hasAnyRole("USER", "ADMIN")
+//
+//                    .requestMatchers("/appointments/my")
+//                    .hasAnyRole("USER", "ADMIN")
+//
+//                    .requestMatchers("/appointments/**")
+//                    .hasRole("ADMIN")
 
                     .anyRequest()
                     .authenticated())

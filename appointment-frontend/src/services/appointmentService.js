@@ -3,11 +3,7 @@ import axios from "axios";
 const API_URL = "http://localhost:8080";
 
 export const getAllServices = () => {
-  return axios.get(`${API_URL}/services`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+  return axios.get(`${API_URL}/services/public`);
 };
 
 export const bookAppointment = (appointment) => {
@@ -121,6 +117,30 @@ export const updateAppointment = (id, appointment) => {
     }
   );
 };
+
+export const exportAppointmentsToExcel = () => {
+  return axios.get(
+    `${API_URL}/appointments/export/excel`,
+    {
+      responseType: "blob",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+};
+export const exportAppointmentsToPdf = () => {
+  return axios.get(
+    `${API_URL}/appointments/export/pdf`,
+    {
+      responseType: "blob",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+};
+
 
 
 

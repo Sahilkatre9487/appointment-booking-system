@@ -28,7 +28,7 @@ function Login() {
 console.log("Role in localStorage:", localStorage.getItem("role"));
 
          if (response.data.role === "ADMIN") {
-        navigate("/admin/appointments");
+        navigate("/admin/dashboard");
          } else {
             navigate("/my-appointments");
       }
@@ -47,60 +47,107 @@ console.log("Role in localStorage:", localStorage.getItem("role"));
   };
 
   return (
-    <div className="container">
+  <div className="container-fluid">
+
+    <div className="row" style={{ minHeight: "90vh" }}>
+
+      {/* Left Side */}
+
       <div
-        className="row justify-content-center align-items-center"
-        style={{ minHeight: "100vh" }}
+        className="col-md-6 d-flex flex-column justify-content-center align-items-center bg-primary text-white"
       >
-        <div className="col-md-5">
-          <div className="card shadow p-4">
 
-            <h2 className="text-center mb-4">
-              Appointment Booking Login
-            </h2>
+        <h1 className="display-4 fw-bold">
+          🏥 Appointment Booking
+        </h1>
 
-            <form onSubmit={handleSubmit}>
+        <p className="lead mt-3 text-center px-5">
 
-              <div className="mb-3">
-                <label>Email</label>
+          Book appointments with doctors anytime,
+          anywhere through our secure online platform.
 
-                <input
-                  type="email"
-                  className="form-control"
-                  value={email}
-                  onChange={(e) =>
-                    setEmail(e.target.value)
-                  }
-                />
-              </div>
+        </p>
 
-              <div className="mb-3">
-                <label>Password</label>
+      </div>
 
-                <input
-                  type="password"
-                  className="form-control"
-                  value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value)
-                  }
-                />
-              </div>
+      {/* Right Side */}
 
-              <button
-                type="submit"
-                className="btn btn-primary w-100"
-              >
-                Login
-              </button>
+      <div
+        className="col-md-6 d-flex justify-content-center align-items-center"
+      >
 
-            </form>
+        <div
+          className="card shadow-lg border-0 p-5"
+          style={{ width: "420px" }}
+        >
+
+          <h2 className="text-center mb-4">
+
+            Login
+
+          </h2>
+
+          <form onSubmit={handleSubmit}>
+
+            <div className="mb-3">
+
+              <label>Email</label>
+
+              <input
+                type="email"
+                className="form-control"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+              />
+
+            </div>
+
+            <div className="mb-4">
+
+              <label>Password</label>
+
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+              />
+
+            </div>
+
+            <button
+              className="btn btn-primary w-100"
+            >
+              Login
+            </button>
+
+          </form>
+
+          <div className="text-center mt-3">
+
+            Don't have an account?
+
+            <a
+              href="/register"
+              className="ms-2"
+            >
+              Register
+            </a>
 
           </div>
+
         </div>
+
       </div>
+
     </div>
-  );
+
+  </div>
+);
 }
 
 export default Login;
