@@ -1,10 +1,7 @@
 package com.appointment.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.appointment.dto.LoginRequestDto;
 import com.appointment.dto.LoginResponseDto;
@@ -16,21 +13,25 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
-	@Autowired
-	private AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-	@PostMapping("/register")
-	public User register(
-			@Valid @RequestBody RegisterRequestDto dto) {
-		return authService.register(dto);
-	}
-	@PostMapping("/login")
-	public LoginResponseDto login(
-	       @Valid @RequestBody LoginRequestDto dto) {
+    // ===========================
+    // REGISTER (USER / PROVIDER)
+    // ===========================
+    @PostMapping("/register")
+    public User register(@Valid @RequestBody RegisterRequestDto dto) {
+        return authService.register(dto);
+    }
 
-	    return authService.login(dto);
-	}
-
+    // ===========================
+    // LOGIN
+    // ===========================
+    @PostMapping("/login")
+    public LoginResponseDto login(@Valid @RequestBody LoginRequestDto dto) {
+        return authService.login(dto);
+    }
 }

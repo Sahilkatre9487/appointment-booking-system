@@ -14,48 +14,60 @@ import com.appointment.security.JwtUtil;
 @Service
 public class AuthService {
 
-	@Autowired
-	private JwtUtil jwtUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	public User register(RegisterRequestDto dto) {
+    // ===========================
+    // REGISTER
+    // ===========================
+    public User register(RegisterRequestDto dto) {
 
-		  if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-		        throw new RuntimeException("Email already exists");
-		    }
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
 
-		User user =new User();
+        User user = new User();
 
-		user.setName(dto.getName());
-		user.setEmail(dto.getEmail());
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
-		user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        // Default role = USER
+        if (dto.getRole() == null || dto.getRole().isBlank()) {
+            user.setRole("USER");
+        } else {
+            user.setRole(dto.getRole().toUpperCase());
+        }
 
-		user.setRole("USER");
+        return userRepository.save(user);
+    }
 
-		return userRepository.save(user);
-	}
-	public LoginResponseDto login(LoginRequestDto dto) {
+    // ===========================
+    // LOGIN
+    // ===========================
+    public LoginResponseDto login(LoginRequestDto dto) {
 
-	    User user = userRepository.findByEmail(dto.getEmail())
-	            .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-	    if (!passwordEncoder.matches(
-	            dto.getPassword(),
-	            user.getPassword())) {
+        if (!passwordEncoder.matches(
+                dto.getPassword(),
+                user.getPassword())) {
 
-	        throw new RuntimeException("Invalid Password");
-	    }
+            throw new RuntimeException("Invalid Password");
+        }
 
-	    String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
 
-	    return new LoginResponseDto(token, user.getRole());
-	}
-
-
+        return new LoginResponseDto(
+                token,
+                user.getRole()
+        );
+    }
 }

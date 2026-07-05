@@ -36,6 +36,8 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.appointment.security.JwtUtil;
+import com.appointment.model.Provider;
+import com.appointment.repository.ProviderRepository;
 
 @Service
 public class AppointmentService {
@@ -51,6 +53,9 @@ public class AppointmentService {
 
     @Autowired
     private EmailService emailService;
+    
+    @Autowired
+    private ProviderRepository providerRepository;
 
     public Page<Appointment> getAppointments(
             int page,
@@ -78,20 +83,34 @@ public class AppointmentService {
                     "This time slot is already booked.");
         }
 
-        User user = userRepository.findById(dto.getUserId()).get();
+    	User user = userRepository.findById(dto.getUserId()).get();
 
-        ServiceEntity service =
-                serviceRepository.findById(dto.getServiceId()).get();
+    	ServiceEntity service =
+    	        serviceRepository.findById(dto.getServiceId()).get();
 
-        Appointment appointment = new Appointment();
+    	// Find an approved provider for this service
+    	Provider provider = providerRepository
+    	        .findFirstByServiceIdAndStatus(
+    	                dto.getServiceId(),
+    	                "APPROVED")
+    	        .orElseThrow(() ->
+    	                new RuntimeException(
+    	                        "No approved provider available for this service"));
 
-        appointment.setAppointmentDate(dto.getAppointmentDate());
-        appointment.setAppointmentTime(dto.getAppointmentTime());
-        appointment.setStatus("PENDING");
-        appointment.setUser(user);
-        appointment.setService(service);
+    	Appointment appointment = new Appointment();
 
-        return appointmentRepository.save(appointment);
+    	appointment.setAppointmentDate(dto.getAppointmentDate());
+    	appointment.setAppointmentTime(dto.getAppointmentTime());
+
+    	appointment.setStatus("PENDING");
+
+    	appointment.setUser(user);
+    	appointment.setService(service);
+
+    	// NEW
+    	appointment.setProvider(provider);
+
+    	return appointmentRepository.save(appointment);
     }
 
     public List<Appointment> getAllAppointments() {
@@ -322,6 +341,83 @@ public class AppointmentService {
 	    );
 
 	    return dto;
+	}
+	
+	// ===============================
+	// Provider Appointments
+	// ===============================
+
+	public List<Appointment> getProviderAppointments() {
+
+	    Authentication authentication =
+	            SecurityContextHolder.getContext()
+	                    .getAuthentication();
+
+	    String email = authentication.getName();
+
+	    return appointmentRepository.findByProviderUserEmail(email);
+	}
+
+	public Appointment providerApproveAppointment(Long id) {
+
+	    Authentication authentication =
+	            SecurityContextHolder.getContext()
+	                    .getAuthentication();
+
+	    String email = authentication.getName();
+
+	    Appointment appointment = appointmentRepository.findById(id)
+	            .orElseThrow(() ->
+	                    new RuntimeException("Appointment not found"));
+
+	    if (!appointment.getProvider()
+	            .getUser()
+	            .getEmail()
+	            .equals(email)) {
+
+	        throw new RuntimeException(
+	                "You are not allowed to approve this appointment");
+	    }
+
+	    appointment.setStatus("APPROVED");
+
+	    emailService.sendEmail(
+	            appointment.getUser().getEmail(),
+	            "Appointment Approved",
+	            "Your appointment has been approved.");
+
+	    return appointmentRepository.save(appointment);
+	}
+
+	public Appointment providerCancelAppointment(Long id) {
+
+	    Authentication authentication =
+	            SecurityContextHolder.getContext()
+	                    .getAuthentication();
+
+	    String email = authentication.getName();
+
+	    Appointment appointment = appointmentRepository.findById(id)
+	            .orElseThrow(() ->
+	                    new RuntimeException("Appointment not found"));
+
+	    if (!appointment.getProvider()
+	            .getUser()
+	            .getEmail()
+	            .equals(email)) {
+
+	        throw new RuntimeException(
+	                "You are not allowed to cancel this appointment");
+	    }
+
+	    appointment.setStatus("CANCELLED");
+
+	    emailService.sendEmail(
+	            appointment.getUser().getEmail(),
+	            "Appointment Cancelled",
+	            "Your appointment has been cancelled.");
+
+	    return appointmentRepository.save(appointment);
 	}
 
 }

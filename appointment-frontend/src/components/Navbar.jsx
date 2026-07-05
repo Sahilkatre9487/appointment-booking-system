@@ -47,6 +47,15 @@ function Navbar() {
             </Link>
           </li>
 
+            {role === "PROVIDER" && (
+  <li className="nav-item">
+    <Link className="nav-link" to="/provider/dashboard">
+      Provider Dashboard
+    </Link>
+  </li>
+)}
+
+
           {token && role === "USER" && (
             <>
               <li className="nav-item">

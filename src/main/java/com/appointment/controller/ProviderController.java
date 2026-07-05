@@ -3,38 +3,57 @@ package com.appointment.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.appointment.dto.DashboardDto;
-import com.appointment.model.Appointment;
-import com.appointment.service.AppointmentService;
+import com.appointment.dto.ProviderRegisterDto;
+import com.appointment.model.Provider;
+import com.appointment.service.ProviderService;
+
+import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/provider")
+@RequestMapping("/providers")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProviderController {
 
     @Autowired
-    private AppointmentService appointmentService;
+    private ProviderService providerService;
 
-    // GET PROVIDER APPOINTMENTS
-    @GetMapping("/appointments")
-    public List<Appointment> getProviderAppointments() {
+    // Provider Registration
+    @PostMapping("/register")
+    public Provider registerProvider(
+            @Valid @RequestBody ProviderRegisterDto dto) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-
-        return appointmentService.getProviderAppointments(email);
+        return providerService.registerProvider(dto);
     }
 
-    // PROVIDER DASHBOARD
-    @GetMapping("/dashboard")
-    public DashboardDto getProviderDashboard() {
+    // Get All Providers
+    @GetMapping
+    public List<Provider> getAllProviders() {
+        return providerService.getAllProviders();
+    }
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+    // Pending Providers
+    @GetMapping("/pending")
+    public List<Provider> getPendingProviders() {
+        return providerService.getPendingProviders();
+    }
 
-        return appointmentService.getProviderDashboard(email);
+    // Approved Providers
+    @GetMapping("/approved")
+    public List<Provider> getApprovedProviders() {
+        return providerService.getApprovedProviders();
+    }
+
+    // Approve Provider
+    @PutMapping("/{id}/approve")
+    public Provider approveProvider(@PathVariable Long id) {
+        return providerService.approveProvider(id);
+    }
+
+    // Reject Provider
+    @PutMapping("/{id}/reject")
+    public Provider rejectProvider(@PathVariable Long id) {
+        return providerService.rejectProvider(id);
     }
 }

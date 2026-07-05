@@ -29,7 +29,7 @@ ChartJS.register(
   Legend
 );
 
-function AdminAppointments() {
+function ManageAppointments() {
   const [appointments, setAppointments] = useState([]);
   const [dashboard, setDashboard] = useState({});
   const [selectedDate, setSelectedDate] = useState("");

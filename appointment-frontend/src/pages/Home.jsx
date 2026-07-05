@@ -40,21 +40,28 @@ function Home() {
 
           <div className="mt-4">
 
-            <Link
-              to="/register"
-              className="btn btn-light btn-lg me-3"
-            >
-              Get Started
-            </Link>
+    <Link
+        to="/register"
+        className="btn btn-light btn-lg me-3"
+    >
+        Register as Customer
+    </Link>
 
-            <Link
-              to="/login"
-              className="btn btn-outline-light btn-lg"
-            >
-              Login
-            </Link>
+    <Link
+        to="/provider-register"
+        className="btn btn-warning btn-lg me-3"
+    >
+        Become a Provider
+    </Link>
 
-          </div>
+    <Link
+        to="/login"
+        className="btn btn-outline-light btn-lg"
+    >
+        Login
+    </Link>
+
+</div>
 
         </div>
       </div>
@@ -84,6 +91,69 @@ function Home() {
         )}
 
       </div>
+
+      {/* Provider Section */}
+
+<div className="container my-5">
+
+    <div className="row align-items-center">
+
+        <div className="col-md-6">
+
+            <h2 className="fw-bold">
+                Grow Your Business with EasyBook
+            </h2>
+
+            <p className="lead mt-3">
+
+                Join EasyBook as a verified service provider and
+                receive online bookings from customers searching
+                for trusted professionals.
+
+            </p>
+
+            <ul className="list-group list-group-flush">
+
+                <li className="list-group-item">
+                    ✓ Accept appointments online
+                </li>
+
+                <li className="list-group-item">
+                    ✓ Manage your own schedule
+                </li>
+
+                <li className="list-group-item">
+                    ✓ Increase your business visibility
+                </li>
+
+                <li className="list-group-item">
+                    ✓ Secure customer management
+                </li>
+
+            </ul>
+
+            <Link
+                to="/provider-register"
+                className="btn btn-primary mt-4"
+            >
+                Register Your Business
+            </Link>
+
+        </div>
+
+        <div className="col-md-6 text-center">
+
+            <img
+                src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=800"
+                className="img-fluid rounded shadow"
+                alt="Provider"
+            />
+
+        </div>
+
+    </div>
+
+</div>
 
       {/* FEATURES */}
       <div className="container my-5">

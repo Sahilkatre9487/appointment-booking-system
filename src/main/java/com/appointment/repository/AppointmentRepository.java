@@ -25,6 +25,19 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>{
 	        Long serviceId,
 	        LocalDate appointmentDate,
 	        LocalTime appointmentTime);
+	
+	// Provider Dashboard
+	List<Appointment> findByProviderUserEmail(String email);
+
+	// Provider + Status
+	List<Appointment> findByProviderUserEmailAndStatus(
+	        String email,
+	        String status);
+
+	// Provider + Date
+	List<Appointment> findByProviderUserEmailAndAppointmentDate(
+	        String email,
+	        LocalDate appointmentDate);
 
 
 

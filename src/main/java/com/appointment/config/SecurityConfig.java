@@ -67,20 +67,58 @@ public class SecurityConfig {
                     .requestMatchers("/services/**")
                     .hasRole("ADMIN")
                     
-                    .requestMatchers("/provider/**")
+                 // Provider Registration (Public)
+                    .requestMatchers("/providers/register")
+                    .permitAll()
+
+                    // Public Provider List
+                    .requestMatchers("/providers/approved")
+                    .permitAll()
+
+                    // Provider Dashboard
+                    .requestMatchers("/providers/dashboard/**")
+                    .hasRole("PROVIDER")
+
+                    // Admin manages providers
+                    .requestMatchers(
+                            "/providers/pending",
+                            "/providers/*/approve",
+                            "/providers/*/reject"
+                    )
+                    .hasRole("ADMIN")
+
+                    // Provider APIs
+                    .requestMatchers("/providers/**")
                     .hasAnyRole("PROVIDER", "ADMIN")
 
                     .requestMatchers(
                             "/appointments",
-                            "/appointments/my",
+                            "/appointments/my"
+                    )
+                    .hasRole("USER")
+
+                    .requestMatchers(
+                            "/appointments/provider/**"
+                    )
+                    .hasRole("PROVIDER")
+
+                    .requestMatchers(
                             "/appointments/dashboard"
                     )
-                    .hasAnyRole("USER", "ADMIN")
-
+                    .hasRole("ADMIN")
+                    
+                    
                     .requestMatchers(
                             "/appointments/admin/**",
                             "/appointments/export/**",
-                            "/appointments/search/**"
+                            "/appointments/search/**",
+                            "/appointments/status/**",
+                            "/appointments/date/**",
+                            "/appointments/page",
+                            "/appointments/service/**",
+                            "/appointments/{id}",
+                            "/appointments/{id}/approve",
+                            "/appointments/{id}/cancel"
                     )
                     .hasRole("ADMIN")
 //                    .requestMatchers("/appointments")

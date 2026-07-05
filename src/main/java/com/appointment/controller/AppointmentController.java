@@ -75,6 +75,26 @@ public class AppointmentController {
     public List<Appointment>getMyAppointments(){
     	return appointmentService.getMyAppointment();
     }
+    
+    @GetMapping("/provider")
+    public List<Appointment> getProviderAppointments() {
+
+        return appointmentService.getProviderAppointments();
+    }
+
+    @PutMapping("/provider/{id}/approve")
+    public Appointment providerApproveAppointment(
+            @PathVariable Long id) {
+
+        return appointmentService.providerApproveAppointment(id);
+    }
+
+    @PutMapping("/provider/{id}/cancel")
+    public Appointment providerCancelAppointment(
+            @PathVariable Long id) {
+
+        return appointmentService.providerCancelAppointment(id);
+    }
     @GetMapping("/page")
     public Page<Appointment> getAppointments(
             @RequestParam(defaultValue = "0")

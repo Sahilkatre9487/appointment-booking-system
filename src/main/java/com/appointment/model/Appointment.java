@@ -15,30 +15,35 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="appointments")
+@Table(name = "appointments")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Appointment {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private LocalDate appointmentDate;
+    private LocalDate appointmentDate;
 
-	private LocalTime appointmentTime;
+    private LocalTime appointmentTime;
 
-	private String status;
+    private String status;
 
-	@ManyToOne
-	@JoinColumn(name="user_id")
-	private User user;
+    // Customer who booked
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-	@ManyToOne
-	@JoinColumn(name="service_id")
-	private ServiceEntity service;
+    // Selected service
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private ServiceEntity service;
+
+    // Provider who will handle this appointment
+    @ManyToOne
+    @JoinColumn(name = "provider_id")
+    private Provider provider;
 
 }
-//hi
-//Hell0
