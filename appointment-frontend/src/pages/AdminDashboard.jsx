@@ -29,7 +29,7 @@ ChartJS.register(
   Legend
 );
 
-function ManageAppointments() {
+function AdminDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [dashboard, setDashboard] = useState({});
   const [selectedDate, setSelectedDate] = useState("");
@@ -645,4 +645,4 @@ Next
   );
 }
 
-export default AdminAppointments;
+export default AdminDashboard;

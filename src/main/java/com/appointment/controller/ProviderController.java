@@ -10,6 +10,8 @@ import com.appointment.model.Provider;
 import com.appointment.service.ProviderService;
 
 import jakarta.validation.Valid;
+import com.appointment.model.Appointment;
+import com.appointment.service.AppointmentService;
 
 @RestController
 @RequestMapping("/providers")
@@ -18,6 +20,8 @@ public class ProviderController {
 
     @Autowired
     private ProviderService providerService;
+    @Autowired
+    private AppointmentService appointmentService;
 
     // Provider Registration
     @PostMapping("/register")
@@ -55,5 +59,32 @@ public class ProviderController {
     @PutMapping("/{id}/reject")
     public Provider rejectProvider(@PathVariable Long id) {
         return providerService.rejectProvider(id);
+    }
+    @GetMapping("/appointments")
+    public List<Appointment> getProviderAppointments() {
+
+        return appointmentService.getProviderAppointments();
+
+    }
+
+    @PutMapping("/appointments/{id}/approve")
+    public Appointment approveAppointment(@PathVariable Long id) {
+
+        return appointmentService.providerApproveAppointment(id);
+
+    }
+
+    @PutMapping("/appointments/{id}/cancel")
+    public Appointment cancelAppointment(@PathVariable Long id) {
+
+        return appointmentService.providerCancelAppointment(id);
+
+    }
+    @GetMapping("/service/{serviceId}")
+    public List<Provider> getProvidersByService(
+            @PathVariable Long serviceId){
+
+        return providerService.getApprovedProvidersByService(serviceId);
+
     }
 }

@@ -27,4 +27,8 @@ public interface ProviderRepository extends JpaRepository<Provider, Long> {
     List<Provider> findByServiceId(Long serviceId);
     
     Optional<Provider> findFirstByServiceIdAndStatus(Long serviceId, String status);
+
+    List<Provider> findByServiceIdAndStatus(
+            Long serviceId,
+            String status);
 }

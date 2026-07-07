@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppointmentRequestDto {
-
+	
+	private Long userId;
+    private Long serviceId;
+    private Long providerId;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
-    private Long userId;
-    private Long serviceId;
+    
 }

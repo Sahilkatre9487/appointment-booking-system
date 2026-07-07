@@ -103,4 +103,11 @@ public class ProviderService {
 
         return providerRepository.save(provider);
     }
+
+    public List<Provider> getApprovedProvidersByService(Long serviceId){
+
+        return providerRepository
+                .findByServiceIdAndStatus(serviceId,"APPROVED");
+
+    }
 }

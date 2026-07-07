@@ -74,6 +74,8 @@ public class SecurityConfig {
                     // Public Provider List
                     .requestMatchers("/providers/approved")
                     .permitAll()
+                    .requestMatchers("/providers/service/**")
+                    .permitAll()
 
                     // Provider Dashboard
                     .requestMatchers("/providers/dashboard/**")
@@ -97,9 +99,7 @@ public class SecurityConfig {
                     )
                     .hasRole("USER")
 
-                    .requestMatchers(
-                            "/appointments/provider/**"
-                    )
+                    .requestMatchers("/providers/appointments/**")
                     .hasRole("PROVIDER")
 
                     .requestMatchers(

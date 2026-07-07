@@ -91,6 +91,15 @@ function Navbar() {
                   Manage Appointments
                 </Link>
               </li>
+
+              <li className="nav-item">
+    <Link
+        className="nav-link"
+        to="/admin/providers"
+    >
+        Manage Providers
+    </Link>
+</li>
             </>
           )}
 
@@ -117,7 +126,7 @@ function Navbar() {
             <li className="nav-item">
               <button
                 className="btn btn-danger ms-3"
-                onClick={handleLogout}
+                onClick={logout}
               >
                 Logout
               </button>

@@ -15,7 +15,7 @@ function ProviderDashboard() {
   const loadAppointments = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8080/provider/appointments",
+        "http://localhost:8080/providers/appointments",
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -31,23 +31,28 @@ function ProviderDashboard() {
     }
   };
 
-  const updateStatus = async (id, status) => {
-    try {
-      await axios.put(
-        `http://localhost:8080/appointments/${id}/${status}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+ const updateStatus = async (id, status) => {
+  try {
 
-      loadAppointments();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    const url =
+status==="APPROVED"
+?
+`http://localhost:8080/providers/appointments/${id}/approve`
+:
+`http://localhost:8080/providers/appointments/${id}/cancel`;
+
+    await axios.put(url, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    loadAppointments();
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
     <div className="container mt-4">

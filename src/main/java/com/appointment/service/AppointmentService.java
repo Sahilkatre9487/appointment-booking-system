@@ -89,14 +89,12 @@ public class AppointmentService {
     	        serviceRepository.findById(dto.getServiceId()).get();
 
     	// Find an approved provider for this service
-    	Provider provider = providerRepository
-    	        .findFirstByServiceIdAndStatus(
-    	                dto.getServiceId(),
-    	                "APPROVED")
-    	        .orElseThrow(() ->
-    	                new RuntimeException(
-    	                        "No approved provider available for this service"));
-
+    	Provider provider =
+    			providerRepository.findById(dto.getProviderId())
+    			.orElseThrow(() ->
+    			new RuntimeException("Provider not found"));
+    	
+    	
     	Appointment appointment = new Appointment();
 
     	appointment.setAppointmentDate(dto.getAppointmentDate());

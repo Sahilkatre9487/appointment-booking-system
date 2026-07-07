@@ -33,7 +33,7 @@ function Register() {
 
     try {
 
-      await register({
+      await registerCustomer({
         name: formData.name,
         email: formData.email,
         password: formData.password,

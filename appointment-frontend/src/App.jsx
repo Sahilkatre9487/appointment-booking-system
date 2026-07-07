@@ -13,11 +13,12 @@ import MyAppointments from "./pages/MyAppointments";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import AdminProviders from "./pages/AdminProviders";
-import ProviderRegister from "./pages/ProviderRegister";
+import ProviderDashboard from "./pages/provider/ProviderDashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./layouts/MainLayout";
 import ManageAppointments from "./pages/ManageAppointments";
+
 
 function App() {
   return (
@@ -34,9 +35,13 @@ function App() {
           <Route path="/register" element={<Register />} />
 
           <Route
-            path="/provider-register"
-            element={<ProviderRegister />}
-          />
+  path="/provider/dashboard"
+  element={
+    <ProtectedRoute>
+      <ProviderDashboard />
+    </ProtectedRoute>
+  }
+/>
 
           <Route
             path="/dashboard"
@@ -75,13 +80,13 @@ function App() {
           />
 
           <Route
-            path="/admin/appointments"
-            element={
-              <ProtectedRoute adminOnly={true}>
-                <AdminAppointments />
-              </ProtectedRoute>
-            }
-          />
+  path="/admin/appointments"
+  element={
+    <ProtectedRoute adminOnly={true}>
+      <ManageAppointments />
+    </ProtectedRoute>
+  }
+/>
 
           <Route
             path="/admin/providers"
