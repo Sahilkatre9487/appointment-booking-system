@@ -27,11 +27,21 @@ function Login() {
          console.log("Saved role:", response.data.role);
 console.log("Role in localStorage:", localStorage.getItem("role"));
 
-         if (response.data.role === "ADMIN") {
-        navigate("/admin/dashboard");
-         } else {
-            navigate("/my-appointments");
-      }
+        if (response.data.role === "ADMIN") {
+
+    navigate("/admin/dashboard");
+
+}
+else if (response.data.role === "PROVIDER") {
+
+    navigate("/provider/dashboard");
+
+}
+else {
+
+    navigate("/my-appointments");
+
+}
 
         alert("Login Successful");
 

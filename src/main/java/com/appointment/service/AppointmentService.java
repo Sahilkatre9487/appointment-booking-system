@@ -73,42 +73,58 @@ public class AppointmentService {
 
     public Appointment saveAppointment(AppointmentRequestDto dto) {
 
-    	if (appointmentRepository
-                .existsByServiceIdAndAppointmentDateAndAppointmentTime(
-                        dto.getServiceId(),
-                        dto.getAppointmentDate(),
-                        dto.getAppointmentTime())) {
+        // Check if slot is already booked
+        if (appointmentRepository.existsByServiceIdAndAppointmentDateAndAppointmentTime(
+                dto.getServiceId(),
+                dto.getAppointmentDate(),
+                dto.getAppointmentTime())) {
 
-            throw new RuntimeException(
-                    "This time slot is already booked.");
+            throw new RuntimeException("This time slot is already booked.");
         }
 
-    	User user = userRepository.findById(dto.getUserId()).get();
+        // Get logged-in user from JWT
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-    	ServiceEntity service =
-    	        serviceRepository.findById(dto.getServiceId()).get();
+        String email = authentication.getName();
 
-    	// Find an approved provider for this service
-    	Provider provider =
-    			providerRepository.findById(dto.getProviderId())
-    			.orElseThrow(() ->
-    			new RuntimeException("Provider not found"));
-    	
-    	
-    	Appointment appointment = new Appointment();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
-    	appointment.setAppointmentDate(dto.getAppointmentDate());
-    	appointment.setAppointmentTime(dto.getAppointmentTime());
+        // Get Service
+        ServiceEntity service = serviceRepository.findById(dto.getServiceId())
+                .orElseThrow(() ->
+                        new RuntimeException("Service not found"));
 
-    	appointment.setStatus("PENDING");
+        // Get Provider
+        Provider provider = providerRepository.findById(dto.getProviderId())
+                .orElseThrow(() ->
+                        new RuntimeException("Provider not found"));
 
-    	appointment.setUser(user);
-    	appointment.setService(service);
+        // Create Appointment
+        Appointment appointment = new Appointment();
 
-    	// NEW
-    	appointment.setProvider(provider);
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+        appointment.setAppointmentTime(dto.getAppointmentTime());
+        appointment.setStatus("PENDING");
 
-    	return appointmentRepository.save(appointment);
+        appointment.setUser(user);
+        appointment.setService(service);
+        appointment.setProvider(provider);
+
+        // Save Appointment
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        System.out.println("==================================");
+        System.out.println("Appointment Saved Successfully");
+        System.out.println("ID       : " + savedAppointment.getId());
+        System.out.println("User     : " + savedAppointment.getUser().getEmail());
+        System.out.println("Provider : " + savedAppointment.getProvider().getUser().getEmail());
+        System.out.println("Service  : " + savedAppointment.getService().getServiceName());
+        System.out.println("==================================");
+
+        return savedAppointment;
     }
 
     public List<Appointment> getAllAppointments() {
@@ -154,7 +170,7 @@ public class AppointmentService {
     	String email =authentication.getName();
 
     	return appointmentRepository
-    			.findByUserEmail(email);
+    			.findByUser_Email(email);
     }
     public List<Appointment> getAppointmentsByDate(
             LocalDate appointmentDate) {
@@ -302,41 +318,32 @@ public class AppointmentService {
 	}
 	public List<Appointment> getProviderAppointments(String providerEmail) {
 
-	    User provider = userRepository.findByEmail(providerEmail)
-	            .orElseThrow(() -> new RuntimeException("Provider not found"));
+	    return appointmentRepository.findByProvider_User_Email(providerEmail);
 
-	    return appointmentRepository.findAll()
-	            .stream()
-	            .filter(a -> a.getService().getProvider() != null)
-	            .filter(a -> a.getService().getProvider().getId().equals(provider.getId()))
-	            .toList();
 	}
 	public DashboardDto getProviderDashboard(String email) {
 
-	    User provider = userRepository.findByEmail(email)
-	            .orElseThrow();
-
-	    List<Appointment> list = appointmentRepository.findAll()
-	            .stream()
-	            .filter(a -> a.getService().getProvider() != null)
-	            .filter(a -> a.getService().getProvider().getId().equals(provider.getId()))
-	            .toList();
+	    List<Appointment> list =
+	            appointmentRepository.findByProvider_User_Email(email);
 
 	    DashboardDto dto = new DashboardDto();
 
-	    dto.setTotalAppointments(list.size());
+	    dto.setTotalAppointments((long) list.size());
 
 	    dto.setPendingAppointments(
-	            list.stream().filter(a -> a.getStatus().equals("PENDING")).count()
-	    );
+	            list.stream()
+	                    .filter(a -> "PENDING".equals(a.getStatus()))
+	                    .count());
 
 	    dto.setApprovedAppointments(
-	            list.stream().filter(a -> a.getStatus().equals("APPROVED")).count()
-	    );
+	            list.stream()
+	                    .filter(a -> "APPROVED".equals(a.getStatus()))
+	                    .count());
 
 	    dto.setCancelledAppointments(
-	            list.stream().filter(a -> a.getStatus().equals("CANCELLED")).count()
-	    );
+	            list.stream()
+	                    .filter(a -> "CANCELLED".equals(a.getStatus()))
+	                    .count());
 
 	    return dto;
 	}
@@ -353,7 +360,7 @@ public class AppointmentService {
 
 	    String email = authentication.getName();
 
-	    return appointmentRepository.findByProviderUserEmail(email);
+	    return appointmentRepository.findByProvider_User_Email(email);
 	}
 
 	public Appointment providerApproveAppointment(Long id) {

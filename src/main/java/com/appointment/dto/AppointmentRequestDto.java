@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AppointmentRequestDto {
 	
-	private Long userId;
+	
     private Long serviceId;
     private Long providerId;
     private LocalDate appointmentDate;

@@ -10,37 +10,40 @@ import org.springframework.stereotype.Repository;
 import com.appointment.model.Appointment;
 
 @Repository
-public interface AppointmentRepository extends JpaRepository<Appointment, Long>{
-	List<Appointment> findByUserEmail(String email);
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-	List<Appointment> findByStatus(String status);
+    // User Appointments
+    List<Appointment> findByUser_Email(String email);
 
-	List<Appointment> findByAppointmentDate(
-	        LocalDate appointmentDate);
-	List<Appointment> findByServiceServiceName(String serviceName);
+    // Status
+    List<Appointment> findByStatus(String status);
 
-	long countByStatus(String status);
+    // Date
+    List<Appointment> findByAppointmentDate(LocalDate appointmentDate);
 
-	boolean existsByServiceIdAndAppointmentDateAndAppointmentTime(
-	        Long serviceId,
-	        LocalDate appointmentDate,
-	        LocalTime appointmentTime);
-	
-	// Provider Dashboard
-	List<Appointment> findByProviderUserEmail(String email);
+    // Service
+    List<Appointment> findByServiceServiceName(String serviceName);
 
-	// Provider + Status
-	List<Appointment> findByProviderUserEmailAndStatus(
-	        String email,
-	        String status);
+    // Dashboard Count
+    long countByStatus(String status);
 
-	// Provider + Date
-	List<Appointment> findByProviderUserEmailAndAppointmentDate(
-	        String email,
-	        LocalDate appointmentDate);
+    // Prevent duplicate booking
+    boolean existsByServiceIdAndAppointmentDateAndAppointmentTime(
+            Long serviceId,
+            LocalDate appointmentDate,
+            LocalTime appointmentTime);
 
+    // Provider Dashboard
+    List<Appointment> findByProvider_User_Email(String email);
 
+    // Provider + Status
+    List<Appointment> findByProvider_User_EmailAndStatus(
+            String email,
+            String status);
 
-
+    // Provider + Date
+    List<Appointment> findByProvider_User_EmailAndAppointmentDate(
+            String email,
+            LocalDate appointmentDate);
 
 }

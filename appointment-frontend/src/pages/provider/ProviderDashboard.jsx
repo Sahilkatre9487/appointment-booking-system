@@ -31,21 +31,30 @@ function ProviderDashboard() {
     }
   };
 
- const updateStatus = async (id, status) => {
+ const updateStatus = async (id, action) => {
+
+  console.log("BUTTON ACTION =", action);
+
+  let url = "";
+
+  if (action === "approve") {
+    url = `http://localhost:8080/providers/appointments/${id}/approve`;
+  } else {
+    url = `http://localhost:8080/providers/appointments/${id}/cancel`;
+  }
+
+  console.log("REQUEST URL =", url);
+
   try {
-
-    const url =
-status==="APPROVED"
-?
-`http://localhost:8080/providers/appointments/${id}/approve`
-:
-`http://localhost:8080/providers/appointments/${id}/cancel`;
-
-    await axios.put(url, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    await axios.put(
+      url,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    );
 
     loadAppointments();
 
